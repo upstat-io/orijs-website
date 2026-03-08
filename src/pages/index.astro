@@ -1,0 +1,790 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.svelte';
+import OrganicCanvas from '../components/OrganicCanvas.svelte';
+import FeatureCard from '../components/FeatureCard.svelte';
+import CodeBlock from '../components/CodeBlock.svelte';
+import ScrollReveal from '../components/ScrollReveal.svelte';
+import Footer from '../components/Footer.svelte';
+
+const heroCode = `<span class="kw">import</span> { Ori, Type, Params } <span class="kw">from</span> <span class="str">'@orijs/orijs'</span>
+<span class="kw">import type</span> { <span class="type">OriController</span>, <span class="type">RouteBuilder</span> } <span class="kw">from</span> <span class="str">'@orijs/orijs'</span>
+
+<span class="kw">class</span> <span class="type">UsersController</span> <span class="kw">implements</span> <span class="type">OriController</span> {
+  <span class="kw">constructor</span>(<span class="kw">private</span> users<span class="op">:</span> <span class="type">UserService</span>) {}
+
+  <span class="fn">configure</span>(r<span class="op">:</span> <span class="type">RouteBuilder</span>) {
+    r.<span class="fn">get</span>(<span class="str">'/'</span>, () <span class="op">=></span> <span class="kw">this</span>.users.<span class="fn">findAll</span>())
+     .<span class="fn">get</span>(<span class="str">'/:id'</span>, (ctx) <span class="op">=></span> <span class="kw">this</span>.users.<span class="fn">findById</span>(ctx.params.id), {
+        params<span class="op">:</span> Params.<span class="fn">uuid</span>(<span class="str">'id'</span>)
+      })
+  }
+}
+
+Ori.<span class="fn">create</span>()
+  .<span class="fn">provider</span>(<span class="type">UserService</span>)
+  .<span class="fn">controller</span>(<span class="str">'/users'</span>, <span class="type">UsersController</span>, [<span class="type">UserService</span>])
+  .<span class="fn">listen</span>(<span class="num">3000</span>)`;
+
+const providerCode = `<span class="cm">// Every infrastructure piece is a swappable provider</span>
+<span class="kw">import</span> { Ori } <span class="kw">from</span> <span class="str">'@orijs/orijs'</span>
+<span class="kw">import</span> { <span class="type">BullMQProvider</span> } <span class="kw">from</span> <span class="str">'@orijs/bullmq'</span>
+<span class="kw">import</span> { <span class="type">RedisCacheProvider</span> } <span class="kw">from</span> <span class="str">'@orijs/cache-redis'</span>
+
+Ori.<span class="fn">create</span>()
+  <span class="cm">// Swap BullMQ for Kafka, RabbitMQ, or SQS</span>
+  .<span class="fn">events</span>(<span class="kw">new</span> <span class="type">BullMQProvider</span>(redisOpts))
+  <span class="cm">// Swap Redis for Memcached, DynamoDB, or in-memory</span>
+  .<span class="fn">cache</span>(<span class="kw">new</span> <span class="type">RedisCacheProvider</span>(redisOpts))
+  <span class="cm">// Explicit DI — no decorators, no magic</span>
+  .<span class="fn">provider</span>(<span class="type">OrderService</span>, [<span class="type">OrderRepo</span>, <span class="type">EventEmitter</span>])
+  .<span class="fn">controller</span>(<span class="str">'/orders'</span>, <span class="type">OrdersController</span>, [<span class="type">OrderService</span>])
+  .<span class="fn">listen</span>(<span class="num">3000</span>)`;
+
+const features = [
+  {
+    title: 'Provider Architecture',
+    description: 'Every infrastructure piece — caching, events, validation, logging — implements a swappable provider interface. No vendor lock-in.',
+    span: 'wide' as const,
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+  },
+  {
+    title: 'No Decorators',
+    description: 'Fluent builder API instead of decorators. No reflect-metadata overhead, no hidden control flow, simpler testing.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+  },
+  {
+    title: 'Built for Bun',
+    description: 'Native Bun HTTP server, native TypeScript, built-in SQL drivers. Designed for Bun from the ground up.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 3"/></svg>',
+  },
+  {
+    title: 'Explicit DI',
+    description: 'Dependency injection with explicit arrays. TypeScript catches mismatches, dependencies are visible, tree-shaking works.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>',
+  },
+  {
+    title: 'Events &amp; Workflows',
+    description: 'Type-safe events with correlation tracking. Saga-pattern workflows with rollback. BullMQ for production, in-process for dev.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+  },
+  {
+    title: 'Guards &amp; Interceptors',
+    description: 'Request pipeline with guards for auth, interceptors for cross-cutting concerns, and pipes for input transformation.',
+    span: 'wide' as const,
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  },
+];
+---
+
+<Base jsonLd={{
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'OriJs',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Cross-platform',
+  url: 'https://orijs.dev',
+  description: 'A lightweight, high-performance TypeScript backend framework for Bun. Provider-based architecture, explicit DI, fluent API.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  license: 'https://opensource.org/licenses/MIT',
+}}>
+  <Nav client:load />
+
+  <!-- ═══════ HERO ═══════ -->
+  <section class="hero" id="top">
+    <OrganicCanvas client:load />
+    <div class="hero-glow" aria-hidden="true"></div>
+
+    <div class="hero-content container">
+      <div class="hero-text">
+        <div class="hero-badge">
+          <span class="badge-dot" aria-hidden="true"></span>
+          Open Source Backend Framework for Bun
+        </div>
+        <h1>
+          NestJS architecture.<br />
+          <span class="gradient-text">Without the decorators.</span>
+        </h1>
+        <p class="hero-sub">
+          A lightweight, high-performance TypeScript backend framework for Bun.
+          Provider-based architecture, explicit DI, and a fluent&nbsp;API
+          that makes the right way the easy way.
+        </p>
+        <div class="hero-actions">
+          <div class="install-cmd">
+            <code>bun add @orijs/orijs</code>
+          </div>
+          <a href="#features" class="btn-glass primary">Explore</a>
+        </div>
+      </div>
+
+      <div class="hero-code">
+        <CodeBlock code={heroCode} filename="app.ts" client:visible />
+      </div>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">
+      <svg width="20" height="32" viewBox="0 0 20 32" fill="none">
+        <rect x="1" y="1" width="18" height="30" rx="9" stroke="var(--text-dim)" stroke-width="1.5"/>
+        <circle cx="10" cy="9" r="2.5" fill="var(--green-500)" class="scroll-dot"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════ MANIFESTO ═══════ -->
+  <section class="manifesto">
+    <div class="container">
+      <ScrollReveal client:visible>
+        <div class="manifesto-inner">
+          <h2>Three observations.</h2>
+          <p class="manifesto-text">
+            NestJS gets architecture right but is heavy — decorators, reflect-metadata,
+            complex modules. Bun changes the equation with native speed. And frameworks
+            shouldn't lock you into <em>their</em> infrastructure choices. OriJs exists
+            because we wanted all three solved at once.
+          </p>
+        </div>
+      </ScrollReveal>
+
+      <div class="principles">
+        <ScrollReveal delay={100} client:visible>
+          <div class="principle glass-subtle">
+            <h3>No decorator magic</h3>
+            <p>Fluent builder API replaces @Controller, @Get, @UseGuards. Your controllers are just classes — no framework magic needed for testing.</p>
+          </div>
+        </ScrollReveal>
+        <ScrollReveal delay={200} client:visible>
+          <div class="principle glass-subtle">
+            <h3>Swap anything</h3>
+            <p>Every component implements a provider interface. Use Redis today, DynamoDB tomorrow. Your business logic never changes.</p>
+          </div>
+        </ScrollReveal>
+        <ScrollReveal delay={300} client:visible>
+          <div class="principle glass-subtle">
+            <h3>Explicit over magic</h3>
+            <p>Dependencies are visible arrays, not metadata reflection. TypeScript catches mismatches at compile time, not runtime.</p>
+          </div>
+        </ScrollReveal>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ FEATURES ═══════ -->
+  <section class="features" id="features">
+    <div class="container">
+      <ScrollReveal client:visible>
+        <div class="section-header">
+          <span class="section-tag">Capabilities</span>
+          <h2>Everything you need,<br />nothing you don't.</h2>
+        </div>
+      </ScrollReveal>
+
+      <div class="bento-grid" role="list">
+        {features.map((f, i) => (
+          <ScrollReveal delay={i * 80} client:visible>
+            <FeatureCard
+              title={f.title}
+              description={f.description}
+              icon={f.icon}
+              span={f.span}
+              client:visible
+            />
+          </ScrollReveal>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ CODE SHOWCASE ═══════ -->
+  <section class="code-showcase" id="code">
+    <div class="container">
+      <div class="code-split">
+        <ScrollReveal client:visible>
+          <div class="code-explain">
+            <span class="section-tag">Providers</span>
+            <h2>Swap infrastructure,<br />not code.</h2>
+            <p>
+              No <code>@Module</code> system. No <code>reflect-metadata</code>.
+              Just a fluent builder that wires providers, controllers, and
+              services into a linear, visible application lifecycle.
+            </p>
+            <ul class="check-list">
+              <li>BullMQ, Redis, or in-memory — your choice</li>
+              <li>Explicit dependency arrays</li>
+              <li>Singleton DI with circular detection</li>
+              <li>Managed lifecycle with shutdown hooks</li>
+            </ul>
+          </div>
+        </ScrollReveal>
+        <ScrollReveal delay={150} client:visible>
+          <CodeBlock code={providerCode} filename="app.ts" client:visible />
+        </ScrollReveal>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ CTA ═══════ -->
+  <section class="cta" id="get-started">
+    <div class="container">
+      <ScrollReveal client:visible>
+        <div class="cta-inner glass">
+          <h2>Ready to build?</h2>
+          <p>One install. TypeScript. Bun. Ship it.</p>
+          <div class="cta-install">
+            <div class="install-cmd large">
+              <code>bun add @orijs/orijs</code>
+            </div>
+          </div>
+          <div class="cta-links">
+            <a href="/docs" class="btn-glass primary">Read the Docs</a>
+            <a href="https://github.com/upstat-io/orijs" class="btn-glass" target="_blank" rel="noopener">
+              View on GitHub
+            </a>
+          </div>
+        </div>
+      </ScrollReveal>
+    </div>
+  </section>
+
+  <!-- ═══════ OTHER PROJECTS ═══════ -->
+  <section class="projects">
+    <div class="container">
+      <ScrollReveal client:visible>
+        <div class="section-header">
+          <span class="section-tag">From the team</span>
+          <h2>Other projects</h2>
+        </div>
+      </ScrollReveal>
+
+      <div class="projects-grid">
+        <ScrollReveal client:visible>
+          <a href="https://upstat.io" target="_blank" rel="noopener" class="project-card glass-subtle">
+            <div class="project-logo">
+              <svg viewBox="0 0 33 33" fill="none">
+                <path d="M5.39 23.44L3.22 21.27l-.37.37.33.4a29.5 29.5 0 0 1 7.86-4.53c2.15-.74 4.21-1.04 6.02-.87l.05-.52-.52.05c.16 1.81-.14 3.88-.88 6.03a29.5 29.5 0 0 1-4.52 7.86l.4.33.37-.37-2.17-2.17a.52.52 0 0 1 .74-.74l2.17 2.17c.1.1.25.16.39.15a.52.52 0 0 0 .38-.19 31 31 0 0 0 4.71-8.18c.78-2.26 1.1-4.47.93-6.46a.52.52 0 0 0-.47-.47c-2-.18-4.2.13-6.46.9A31 31 0 0 0 2.52 21.24a.52.52 0 0 0 .15.77l2.17 2.17a.52.52 0 0 0 .74-.74Z" fill="var(--green-400)" stroke="var(--green-400)" stroke-width="0.3"/>
+                <path d="M27.72 15.25a.5.5 0 0 1-.14.08.52.52 0 0 1-.64-.09l-2.26-1.98-5 2.19a.52.52 0 0 1-.63-.15.52.52 0 0 1-.11-.55l2.73-5.13-2.83 1.21a.4.4 0 0 1-.43-.04.4.4 0 0 1-.22-.46l.33-2.04-1.27-1.12a.4.4 0 0 1-.04-.53.4.4 0 0 1 .08-.11.5.5 0 0 1 .13-.09.52.52 0 0 1 .65.08l1.47 1.29a.4.4 0 0 1 .16.41l-.22 1.38 3.3-1.41a.52.52 0 0 1 .49.09.52.52 0 0 1 .11.55l-2.72 5.11 3.94-1.73a.52.52 0 0 1 .61.07l.03.02 2.54 2.23a.4.4 0 0 1 .08.86.5.5 0 0 1-.12.16Z" fill="var(--brown-300)" stroke="var(--brown-300)" stroke-width="0.15"/>
+                <path d="M9.55 23.29L5.18 27.65a.52.52 0 0 0 .74.74l4.37-4.37a.52.52 0 0 0-.74-.74Z" fill="var(--green-400)" stroke="var(--green-400)" stroke-width="0.3"/>
+                <path d="M6.4 23.21L1.2 28.41a.52.52 0 0 0 .74.74l5.2-5.2a.52.52 0 0 0-.74-.74Z" fill="var(--green-400)" stroke="var(--green-400)" stroke-width="0.3"/>
+                <path d="M10.38 26.3L5.18 31.5a.52.52 0 0 0 .74.74l5.2-5.2a.52.52 0 0 0-.74-.74Z" fill="var(--green-400)" stroke="var(--green-400)" stroke-width="0.3"/>
+                <path d="M3.68 29.17L1.2 31.65a.52.52 0 0 0 .74.74l2.48-2.48a.52.52 0 0 0-.74-.74Z" fill="var(--green-400)" stroke="var(--green-400)" stroke-width="0.3"/>
+                <path d="M16.11 23.41c3.5-.76 7-2.63 9.91-5.54 3.89-3.9 5.93-8.83 5.93-13.42 0-.82-.07-1.63-.2-2.42l-.05-.32-.32-.05A14.5 14.5 0 0 0 28.95 1.46c-4.59 0-9.52 2.03-13.41 5.92-2.92 2.92-4.79 6.42-5.54 9.92l.89.19c.72-3.32 2.5-6.67 5.3-9.46 3.73-3.73 8.45-5.66 12.77-5.66.77 0 1.53.06 2.27.19l.08-.45-.45.08c.12.74.19 1.5.19 2.27 0 4.32-1.93 9.04-5.66 12.77-2.8 2.8-6.14 4.58-9.46 5.3l.19.89Z" fill="var(--green-400)" stroke="var(--green-400)" stroke-width="0.3"/>
+              </svg>
+            </div>
+            <h3>Upstat</h3>
+            <p>Incident response &amp; operational intelligence for DevOps and SREs.</p>
+            <span class="project-url">upstat.io</span>
+          </a>
+        </ScrollReveal>
+        <ScrollReveal delay={80} client:visible>
+          <a href="https://ori-lang.com" target="_blank" rel="noopener" class="project-card glass-subtle">
+            <div class="project-logo">
+              <svg viewBox="0 0 32 32" fill="none">
+                <defs>
+                  <linearGradient id="ori-lang-bg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#1a2e1f"/>
+                    <stop offset="100%" stop-color="#2a2318"/>
+                  </linearGradient>
+                </defs>
+                <rect width="32" height="32" rx="8" fill="url(#ori-lang-bg)"/>
+                <path d="M9 9 L17 16 L9 23" stroke="var(--green-400)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M17 9 L25 16 L17 23" stroke="var(--brown-300)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Ori Lang</h3>
+            <p>Expression-based language with automatic reference counting. No GC, no borrow checker.</p>
+            <span class="project-url">ori-lang.com</span>
+          </a>
+        </ScrollReveal>
+        <ScrollReveal delay={160} client:visible>
+          <a href="https://oriterm.com" target="_blank" rel="noopener" class="project-card glass-subtle">
+            <div class="project-logo">
+              <svg viewBox="80 150 320 300" fill="none">
+                <polyline points="120,188 228,296 120,404" fill="none" stroke="var(--green-400)" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="280" y="388" width="110" height="18" rx="5" fill="var(--brown-300)" opacity="0.8"/>
+              </svg>
+            </div>
+            <h3>Ori Term</h3>
+            <p>GPU-accelerated terminal OS. Emulation, multiplexing, and sessions unified.</p>
+            <span class="project-url">oriterm.com</span>
+          </a>
+        </ScrollReveal>
+        <ScrollReveal delay={240} client:visible>
+          <a href="https://warpkit.org" target="_blank" rel="noopener" class="project-card glass-subtle">
+            <div class="project-logo">
+              <svg viewBox="2 6 28 20" fill="none">
+                <path d="M8 16 Q12 14, 16 14" stroke="var(--green-400)" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round"/>
+                <path d="M6 16 Q12 16, 18 16" stroke="var(--green-400)" stroke-width="1.8" fill="none" opacity="0.7" stroke-linecap="round"/>
+                <path d="M8 16 Q12 18, 16 18" stroke="var(--green-400)" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round"/>
+                <path d="M18 10 L26 16 L18 22 L21 16 Z" fill="var(--brown-300)"/>
+              </svg>
+            </div>
+            <h3>WarpKit</h3>
+            <p>Svelte 5 SPA framework with state-based routing and pluggable providers.</p>
+            <span class="project-url">warpkit.org</span>
+          </a>
+        </ScrollReveal>
+      </div>
+    </div>
+  </section>
+
+  <Footer client:load />
+</Base>
+
+<style>
+  /* ═══════ HERO ═══════ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding-top: 5rem;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    top: 10%;
+    left: 30%;
+    background: radial-gradient(
+      circle,
+      rgba(74, 124, 89, 0.12) 0%,
+      rgba(74, 124, 89, 0.03) 40%,
+      transparent 70%
+    );
+    pointer-events: none;
+    filter: blur(40px);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem 0.4rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-pill);
+    margin-bottom: 2rem;
+    border: 1px solid var(--glass-border);
+  }
+
+  .badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green-500);
+    box-shadow: 0 0 8px var(--green-glow);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green-glow); }
+    50% { opacity: 0.6; box-shadow: 0 0 16px var(--green-glow); }
+  }
+
+  .hero h1 {
+    margin-bottom: 1.5rem;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--green-400), var(--brown-300));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+    max-width: 480px;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .install-cmd {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: rgba(13, 11, 8, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--glass-border);
+  }
+
+  .install-cmd code {
+    font-size: 0.9rem;
+    color: var(--green-300);
+    letter-spacing: -0.01em;
+  }
+
+  .hero-code {
+    max-width: 520px;
+    justify-self: end;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.4;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  .scroll-dot {
+    animation: scroll-down 2s ease-in-out infinite;
+  }
+
+  @keyframes scroll-down {
+    0% { cy: 9; opacity: 1; }
+    50% { cy: 20; opacity: 0.3; }
+    100% { cy: 9; opacity: 1; }
+  }
+
+  /* ═══════ MANIFESTO ═══════ */
+  .manifesto {
+    background: var(--bg-deep);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  .manifesto-inner {
+    max-width: 700px;
+    margin-bottom: 4rem;
+  }
+
+  .manifesto h2 {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  .manifesto-text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+  }
+
+  .manifesto-text em {
+    color: var(--green-400);
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .principle {
+    height: 100%;
+    padding: 2rem;
+  }
+
+  .principle h3 {
+    margin-bottom: 0.75rem;
+    color: var(--brown-300);
+    font-size: 1.1rem;
+  }
+
+  .principle p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ═══════ FEATURES ═══════ */
+  .section-header {
+    margin-bottom: 3rem;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--green-400);
+    margin-bottom: 1rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(74, 124, 89, 0.1);
+    border: 1px solid rgba(74, 124, 89, 0.15);
+    border-radius: var(--radius-pill);
+  }
+
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  /* ═══════ CODE SHOWCASE ═══════ */
+  .code-showcase {
+    background: var(--bg-deep);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  .code-split {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .code-explain {
+    padding-top: 1rem;
+  }
+
+  .code-explain h2 {
+    margin-bottom: 1.5rem;
+  }
+
+  .code-explain p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .code-explain code {
+    padding: 0.15rem 0.4rem;
+    background: rgba(13, 11, 8, 0.5);
+    border: 1px solid var(--glass-border);
+    border-radius: 4px;
+    color: var(--brown-300);
+    font-size: 0.85em;
+  }
+
+  .check-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .check-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+  }
+
+  .check-list li::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(74, 124, 89, 0.12);
+    border: 1px solid rgba(74, 124, 89, 0.2);
+    flex-shrink: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 10l3 3 5-6' stroke='%235e9e6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+
+  /* ═══════ CTA ═══════ */
+  .cta {
+    padding: clamp(4rem, 10vw, 8rem) 0;
+  }
+
+  .cta-inner {
+    text-align: center;
+    padding: clamp(3rem, 6vw, 5rem);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at 50% 0%,
+      rgba(74, 124, 89, 0.06) 0%,
+      transparent 60%
+    );
+    pointer-events: none;
+  }
+
+  .cta h2 {
+    position: relative;
+    margin-bottom: 0.75rem;
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  .cta p {
+    position: relative;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin: 0 auto 2rem;
+  }
+
+  .cta-install {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .install-cmd.large {
+    padding: 1rem 2rem;
+  }
+
+  .install-cmd.large code {
+    font-size: 1rem;
+  }
+
+  .cta-links {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  /* ═══════ OTHER PROJECTS ═══════ */
+  .projects {
+    background: var(--bg-deep);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.75rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+  }
+
+  .project-card:hover {
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--glass-shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  .project-logo {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(74, 124, 89, 0.1);
+    border: 1px solid rgba(74, 124, 89, 0.15);
+    border-radius: var(--radius-sm);
+    margin-bottom: 1.25rem;
+  }
+
+  .project-logo svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .project-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .project-card p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .project-url {
+    display: inline-block;
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--green-400);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  .project-card:hover .project-url {
+    opacity: 1;
+  }
+
+  /* ═══════ RESPONSIVE ═══════ */
+  @media (max-width: 900px) {
+    .hero-content {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      text-align: left;
+    }
+
+    .hero-code {
+      justify-self: stretch;
+      max-width: 100%;
+    }
+
+    .principles {
+      grid-template-columns: 1fr;
+    }
+
+    .bento-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .code-split {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .projects-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .bento-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .projects-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

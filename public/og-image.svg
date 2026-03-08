@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#1a1612"/>
+  <rect x="0" y="0" width="1200" height="630" fill="url(#glow)" opacity="0.5"/>
+  <defs>
+    <radialGradient id="glow" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#4a7c59" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#1a1612" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Logo icon -->
+  <g transform="translate(100,260)">
+    <circle cx="55" cy="55" r="50" stroke="#4a7c59" stroke-width="3" fill="none"/>
+    <path d="M55 15C35 35 25 60 55 95C85 60 75 35 55 15Z" fill="#4a7c59" opacity="0.7"/>
+    <path d="M55 25C45 45 35 60 55 85" stroke="#7bb88a" stroke-width="2.5" fill="none"/>
+  </g>
+  <!-- Text -->
+  <text x="230" y="290" font-family="system-ui,-apple-system,sans-serif" font-size="72" font-weight="700" fill="#d4cfc4">ori<tspan fill="#5e9e6e">js</tspan></text>
+  <text x="230" y="345" font-family="system-ui,-apple-system,sans-serif" font-size="28" fill="#9a9488">NestJS architecture, without the decorators.</text>
+  <text x="230" y="390" font-family="system-ui,-apple-system,sans-serif" font-size="20" fill="#5a5650">A lightweight TypeScript backend framework for Bun</text>
+  <!-- Bottom accent line -->
+  <rect x="100" y="580" width="200" height="3" rx="1.5" fill="#4a7c59" opacity="0.6"/>
+  <rect x="310" y="580" width="80" height="3" rx="1.5" fill="#a08050" opacity="0.4"/>
+</svg>

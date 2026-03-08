@@ -1,0 +1,229 @@
+/* ═══════════════════════════════════════════════════
+   OriJs — Glass Dark Earth Design System
+   ═══════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ── Earth Palette ── */
+  --bg-deep:     #0d0b08;
+  --bg:          #1a1612;
+  --bg-surface:  #211d17;
+  --bg-elevated: #292420;
+
+  /* Greens */
+  --green-900: #1a3a24;
+  --green-700: #2d5a3d;
+  --green-500: #4a7c59;
+  --green-400: #5e9e6e;
+  --green-300: #7bb88a;
+  --green-200: #a3d4af;
+  --green-glow: rgba(90, 200, 120, 0.6);
+
+  /* Browns */
+  --brown-800: #3d2e1c;
+  --brown-700: #5c4a32;
+  --brown-500: #8b7355;
+  --brown-400: #a08050;
+  --brown-300: #c4a882;
+  --brown-200: #d9c4a0;
+
+  /* Text */
+  --text-primary:   #d4cfc4;
+  --text-secondary: #9a9488;
+  --text-dim:       #5a5650;
+
+  /* ── Glass ── */
+  --glass-bg:     rgba(26, 22, 18, 0.55);
+  --glass-bg-alt: rgba(33, 29, 23, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --glass-border-hover: rgba(255, 255, 255, 0.12);
+  --glass-blur:   16px;
+  --glass-shine:  linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 40%,
+    transparent 60%
+  );
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+
+  /* ── Typography ── */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── Spacing ── */
+  --max-width: 1200px;
+  --gutter:    24px;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 8px;
+  --radius-pill: 9999px;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+/* ── Grain Texture Overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+h1 { font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 700; }
+h2 { font-size: clamp(2rem, 5vw, 3.2rem); }
+h3 { font-size: clamp(1.25rem, 3vw, 1.6rem); }
+
+p { max-width: 65ch; }
+
+a {
+  color: var(--green-400);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:hover { color: var(--green-300); }
+
+code, pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+::selection {
+  background: var(--green-700);
+  color: var(--green-200);
+}
+
+/* ── Layout ── */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+section {
+  padding: clamp(4rem, 10vw, 8rem) 0;
+}
+
+/* ── Glass Utilities ── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  position: relative;
+}
+
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--glass-shine);
+  pointer-events: none;
+}
+
+.glass-subtle {
+  background: var(--glass-bg-alt);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+}
+
+/* ── Buttons ── */
+.btn-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+
+.btn-glass:hover {
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  color: var(--green-300);
+  transform: translateY(-1px);
+}
+
+.btn-glass:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-glass.primary {
+  background: rgba(45, 90, 61, 0.4);
+  color: var(--green-200);
+  border-color: rgba(90, 200, 120, 0.15);
+}
+
+.btn-glass.primary:hover {
+  background: rgba(45, 90, 61, 0.55);
+  color: #fff;
+  border-color: rgba(90, 200, 120, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3),
+              0 0 40px rgba(90, 200, 120, 0.1);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb {
+  background: var(--brown-700);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--brown-500); }
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,232 @@
+---
+import Base from './Base.astro';
+import Nav from '../components/Nav.svelte';
+import Footer from '../components/Footer.svelte';
+import DocsSidebar from '../components/DocsSidebar.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  section: 'guide' | 'docs';
+}
+
+const { title, description, section } = Astro.props;
+const currentPath = Astro.url.pathname;
+const sectionTitle = section === 'guide' ? 'Guide' : 'API Reference';
+const fullTitle = `${title} — OriJs ${sectionTitle}`;
+const fullDescription = description || `${title} — OriJs ${sectionTitle}`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": fullTitle,
+  "description": fullDescription,
+  "url": new URL(currentPath, Astro.site).href,
+  "publisher": {
+    "@type": "Organization",
+    "name": "Upstat",
+    "url": "https://upstat.io",
+  },
+};
+---
+
+<Base
+  title={fullTitle}
+  description={fullDescription}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <Nav client:load />
+
+  <div class="docs-shell">
+    <DocsSidebar section={section} currentPath={currentPath} />
+    <main class="docs-main">
+      <article class="docs-article">
+        <slot />
+      </article>
+    </main>
+  </div>
+
+  <Footer client:load />
+</Base>
+
+<style>
+  .docs-shell {
+    display: flex;
+    min-height: calc(100vh - 60px);
+    padding-top: 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .docs-main {
+    flex: 1;
+    min-width: 0;
+    padding: 48px 48px 80px;
+    max-width: 860px;
+  }
+
+  .docs-article {
+    line-height: 1.7;
+  }
+
+  /* --- Markdown content styles --- */
+  .docs-article :global(h1) {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .docs-article :global(h2) {
+    font-size: 1.4rem;
+    letter-spacing: -0.01em;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .docs-article :global(h3) {
+    font-size: 1.15rem;
+    margin-top: 36px;
+    margin-bottom: 12px;
+  }
+
+  .docs-article :global(h4) {
+    font-size: 1rem;
+    margin-top: 28px;
+    margin-bottom: 8px;
+  }
+
+  .docs-article :global(p) {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  .docs-article :global(ul),
+  .docs-article :global(ol) {
+    margin-bottom: 16px;
+    padding-left: 24px;
+  }
+
+  .docs-article :global(li) {
+    margin-bottom: 6px;
+  }
+
+  .docs-article :global(pre) {
+    position: relative;
+    margin-bottom: 20px;
+    padding: 20px 24px;
+    background: rgba(13, 11, 8, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+
+  .docs-article :global(pre)::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.04) 0%,
+      transparent 40%
+    );
+    pointer-events: none;
+  }
+
+  .docs-article :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+  }
+
+  .docs-article :global(:not(pre) > code) {
+    padding: 0.2rem 0.45rem;
+    background: rgba(13, 11, 8, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 5px;
+    color: var(--green-300);
+  }
+
+  .docs-article :global(blockquote) {
+    margin: 20px 0;
+    padding: 16px 20px;
+    border-left: 3px solid var(--green-500);
+    background: rgba(74, 124, 89, 0.08);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+
+  .docs-article :global(blockquote p) {
+    margin-bottom: 0;
+  }
+
+  .docs-article :global(table) {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .docs-article :global(th) {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+  }
+
+  .docs-article :global(td) {
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+  }
+
+  .docs-article :global(tr:hover td) {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .docs-article :global(hr) {
+    border: none;
+    border-top: 1px solid var(--glass-border);
+    margin: 40px 0;
+  }
+
+  .docs-article :global(a) {
+    color: var(--green-400);
+    transition: color 0.2s;
+  }
+
+  .docs-article :global(a:hover) {
+    color: var(--green-300);
+  }
+
+  .docs-article :global(strong) {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .docs-article :global(img) {
+    max-width: 100%;
+    border-radius: var(--radius-sm);
+  }
+
+  @media (max-width: 768px) {
+    .docs-shell {
+      flex-direction: column;
+    }
+
+    .docs-main {
+      padding: 24px 20px 60px;
+    }
+  }
+</style>

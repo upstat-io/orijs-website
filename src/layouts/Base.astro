@@ -1,0 +1,64 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  ogType?: string;
+  ogImage?: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const {
+  title = 'OriJs — NestJS architecture, without the decorators.',
+  description = 'A lightweight, high-performance TypeScript backend framework for Bun. Provider-based architecture, explicit DI, fluent API. No decorators, no reflect-metadata.',
+  ogType = 'website',
+  ogImage = '/og-image.svg',
+  jsonLd,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(ogImage, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta name="theme-color" content="#1a1612" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none'><circle cx='14' cy='14' r='12' stroke='%234a7c59' stroke-width='2'/><path d='M14 6C10 10 8 16 14 22C20 16 18 10 14 6Z' fill='%234a7c59' opacity='0.7'/><path d='M14 8C12 12 10 16 14 20' stroke='%237bb88a' stroke-width='1.5' fill='none'/></svg>" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+
+    <!-- JSON-LD -->
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content="OriJs" />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <link rel="stylesheet" href="/src/styles/global.css" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

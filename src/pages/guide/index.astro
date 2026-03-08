@@ -1,0 +1,136 @@
+---
+import { getCollection } from 'astro:content';
+import DocsLayout from '../../layouts/Docs.astro';
+import { entryTitle, entryOrder } from '../../lib/docs';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const guideEntries = (await getCollection('guide'))
+  .sort((a, b) => entryOrder(a) - entryOrder(b));
+
+const guideIcons: Record<string, string> = {
+  '01-introduction': '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  '02-quick-start': '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  '03-core-concepts': '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  '04-the-provider-architecture': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h3v3H7z"/><path d="M14 7h3v3h-3z"/><path d="M7 14h3v3H7z"/><path d="M14 14h3v3h-3z"/>',
+  '05-controllers-and-routing': '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+  '06-validation': '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
+  '07-guards-and-authentication': '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  '08-interceptors': '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  '09-configuration': '<circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.2 4.2l2.8 2.8M17 17l2.8 2.8M1 12h4M19 12h4M4.2 19.8l2.8-2.8M17 7l2.8-2.8"/>',
+  '10-data-mapping': '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>',
+  '11-events': '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  '12-workflows': '<path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.828L3 3"/><path d="m15 9 6-6"/>',
+  '13-websockets': '<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20"/>',
+  '14-caching': '<path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/>',
+  '15-logging': '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/>',
+  '16-testing': '<path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16.5h10"/>',
+  '17-advanced-patterns': '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+  '18-migration-from-nestjs': '<path d="M8 3H2v15h7c1.7 0 3 1.3 3 3V7c0-2.2-1.8-4-4-4z"/><path d="M16 3h6v15h-7c-1.7 0-3 1.3-3 3V7c0-2.2 1.8-4 4-4z"/>',
+  '19-api-reference': '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="m9 10 2 2 4-4"/>',
+};
+---
+
+<DocsLayout title="Guide" description="Comprehensive walkthrough of OriJs" section="guide">
+  <h1>OriJs Guide</h1>
+  <p class="intro">
+    A comprehensive walkthrough covering everything from first setup to advanced architecture.
+    Follow the chapters in order, or jump to what you need.
+  </p>
+
+  <div class="chapter-list">
+    {guideEntries.map(entry => {
+      const icon = guideIcons[entry.id];
+      return (
+        <a href={`${base}/guide/${entry.id}`} class="chapter-card">
+          {icon && (
+            <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <Fragment set:html={icon} />
+            </svg>
+          )}
+          <div class="chapter-info">
+            <h3>{entryTitle(entry)}</h3>
+            {entry.data.description && <p>{entry.data.description}</p>}
+          </div>
+        </a>
+      );
+    })}
+  </div>
+</DocsLayout>
+
+<style>
+  .intro {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.65;
+    margin-bottom: 40px;
+    max-width: 55ch;
+  }
+
+  .chapter-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .card-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    color: var(--green-400);
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .chapter-card:hover .card-icon {
+    opacity: 1;
+  }
+
+  .chapter-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 20px 24px;
+    background: var(--glass-bg-alt);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    transition: border-color 0.2s, transform 0.15s, background 0.2s;
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+  }
+
+  .chapter-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--glass-shine);
+    pointer-events: none;
+  }
+
+  .chapter-card:hover {
+    border-color: var(--glass-border-hover);
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateX(4px);
+  }
+
+  .chapter-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+    letter-spacing: normal;
+  }
+
+  .chapter-info p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+  }
+</style>
