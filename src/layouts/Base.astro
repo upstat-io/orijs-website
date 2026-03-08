@@ -15,6 +15,8 @@ const {
   jsonLd,
 } = Astro.props;
 
+import '../styles/global.css';
+
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImageURL = new URL(ogImage, Astro.site);
 ---
@@ -56,7 +58,6 @@ const ogImageURL = new URL(ogImage, Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
 
-    <link rel="stylesheet" href="/src/styles/global.css" />
   </head>
   <body>
     <slot />
